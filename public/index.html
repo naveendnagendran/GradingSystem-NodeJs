@@ -1,0 +1,94 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="style.css">
+<link href='http://fonts.googleapis.com/css?family=Kreon' rel='stylesheet' type='text/css'>
+<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+<script src="jquery-1.7.2.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+jQuery(document).ready(function () {
+	var log_result = function  (message) {
+        jQuery('#result').html(message);
+	};
+
+	var socket = io.connect('http://localhost:3000');
+
+	socket.on('chat', function  (data) {
+		log_result(data.message, 'normal');
+	});
+
+	socket.on('error', function  (data) {
+		log_result(data.message, 'error');
+	});
+
+	jQuery('#buttonGrade').click(function (event) {
+            if(document.getElementById("quiz1").value==="" || document.getElementById("quiz2").value==="" || document.getElementById("midterm").value==="")
+                alert("Please enter all the values");
+            else{
+                var markquiz1 = parseInt(document.getElementById("quiz1").value);
+                var markquiz2 = parseInt(document.getElementById("quiz2").value);
+                var markmidterm = parseInt(document.getElementById("midterm").value);
+                var total = markquiz1+markquiz2+markmidterm;
+                var percentage = total/3;
+                var result;
+
+                if(percentage > 90)
+                    result = "Grade A";
+
+                else if(percentage > 80 && percentage <= 90)
+                    result = "Grade B";
+
+                else if(percentage > 70 && percentage <= 80)
+                    result = "Grade C";
+
+                else
+                    result = "Grade F";
+
+                socket.emit('chat', {message:result});
+            }
+		
+	});
+    
+    	jQuery('#buttonClear').click(function (event) {
+            jQuery('#quiz1').val('');
+            jQuery('#quiz2').val('');
+            jQuery('#midterm').val('');
+            
+            var clearGrade="";
+            jQuery('#result').html(clearGrade);
+            
+	});
+});
+</script>
+    
+</head>
+<body background="img/cloud.jpg">
+
+    <div id="heading">GRADING SYSTEM</div>
+    <br>
+    <table id="tableContent" align="center">
+        <tr>
+            <td><label>Quiz 1 Score:</label></td>
+            <td style="padding-top: 25px; padding-left: 60px;">    <form oninput="x.value=parseInt(a.value)">0<input type="range" id="a" value="50">100=<output name="x" for="a" name="quiz1" id="quiz1"></output> </form></td>
+        </tr>
+        
+        <tr>
+            <td><label>Quiz 2 Score:</label></td>
+            <td style="padding-top: 25px; padding-left: 60px;"><form oninput="x.value=parseInt(a.value)">0<input type="range" id="a" value="50">100=<output name="x" for="a" name="quiz2" id="quiz2"></output> </form></td>
+        </tr>
+    
+        <tr>
+            <td><label>Midterm Score:</label></td>
+            <td style="padding-top: 25px; padding-left: 60px;"><form oninput="x.value=parseInt(a.value)">0<input type="range" id="a" value="50">100=<output name="x" for="a" name="midterm" id="midterm"></output> </form></td>
+        </tr>
+        
+        <tr>
+            <td colspan="2" align="center">  <label id="result"></label></td>
+        </tr>
+
+        <tr>
+            <td align="center"><button value="Grade Me" id="buttonGrade" class="myButton">Grade Me</button></td>
+            <td align="center"><button value="Cancel" id="buttonClear" class="myButton2">Cancel</button></td>
+        </tr>
+    </table> 
+</body>
+</html>
